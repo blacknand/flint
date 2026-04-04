@@ -2,7 +2,7 @@
 **Version: 0.1**
 
 flint uses 32 bits, fixed width registers + instructions. It is little endian. All instructions must be 4-byte aligned. The bottom 2 bits of any valid instruction address are always zero. flint uses nine instruction formats in total. Six are defined here as the base ISA (R, I, S, B, U, J). Three are defined alongside their corresponding GCC backend subsystem work (M, A, V). All formats share the following invariants:
-- The opcode field always occupies bits `[32:26]`. The hardware extracts this field identically regardless of the format.
+- The opcode field always occupies bits `[31:26]`. The hardware extracts this field identically regardless of the format.
 - In formats where the S-bit is present, it occupies bit `[25]`, immediately to the right of the opcode.
 - Where register fields `rs1` and `rs2` are present, `rs1` is always at `[20:17]` and `rs2` is always at `[24:21]`. This allows the hardware to begin reading the register file before format decode is complete.
 - Bit patterns marked reserved must be zero in all encoded instructions. Behaviour on non-zero reserved fields is undefined.
@@ -30,9 +30,9 @@ CR is only updated by instructions with S=1. Instructions with S=0 leave CR enti
 ## R-type (register-register operations)
 ![R-type format](images/flint%20R-type%20encoding.png)
 ### Fields
-- **opcode** `[31:26]`: identifies this instruction as R-type. One major opcode value covers all R-type operations. The `funct` field completes the opcode.
+- **opcode** `[31:26]`: identifies this instruction as R-type. One major opcode value covers all R-type operations. The `funct` field completes the decode.
 - **S** `[25]`: Set-flags bit. When S=1, CR is updated with the N, Z, C, V flags derived from the result. When S=0, CR is unchanged. Valid on all R-type operations without exception.
-- **rd** `[24:32]`: Destination register. The result of the operation is written here.
+- **rd** `[24:21]`: Destination register. The result of the operation is written here.
 - **rs1** `[20:17]`: First source register.
 - **rs2** `[16:13]`: Second source register. For a NOT operation, this field is unused — the assembler encodes `rs = r0` and the hardware ignores it.
 - **funct** `[12:9]`: Selects the specific operation with R-type. 4 bits, 16 slots, 9 currently assigned.
@@ -68,7 +68,7 @@ The following assembler mnenomics are accepted and lowered to R-type encodings:
 ![I-type format](images/flint%20I-type%20encoding.png)
 - **opcode** `[31:26]`: Two distinct major opcode values are used: one for immedaite ALU operations, and one for loads. The `funct` field completes the decode within each group.
 - **S** `[25]`: Set-flags bit. Valid on immediate ALU operations. Must be zero on load instructions. S=1 on load is invalid encoding. Behaviour is undefined
-- **rd** `[24:32]`: Destination register. 
+- **rd** `[24:21]`: Destination register. 
 - **rs1** `[20:17]`: Base register. For ALU operations. For loads, the base address register.
 - **funct** `[16:14]`: Selects the specific operation within each opcode group. 3 bits, 8 slots per group.
 - **imm** `[13:0]`: 14-bit sign immediate. Always sign extend to 32-bits before use. Effective range: -8192 +8191. For load instructions, imm is the signed byte offset added to `rs1` to form the effective address.
@@ -162,9 +162,9 @@ ADDI    rd, rd, lower(k)    ; rd = rd + sign_extend(lower14(k))
 ## J-type (jump and link)
 ![J-type encoding](images/flint%20J-type%20encoding.png)
 ### Fields
-- **opcode** `[32:26]`: One major opcode value.
+- **opcode** `[31:26]`: One major opcode value.
 - **rd** `[25:22]`: Return address destination. The hardware writes `PC + 4` (the address of the instruction following the JAL) into `rd` before jumping. Writing to `r0` discards the return address silently.
-- **offset** `[21:0]`: 22-bit signed PC-relative offset, in units of 4-bytes. Branch target = `PC + sign_extend(offset) << 2`. Range ±8MB..
+- **offset** `[21:0]`: 22-bit signed PC-relative offset, in units of 4-bytes. Branch target = `PC + sign_extend(offset) << 2`. Range ±8MB.
 ### Semantics
 ```
 rd = PC + 4
@@ -176,7 +176,7 @@ Both operations occur atomically — `rd` recieves the return address before the
 ```
 JAL r15, target     ; r15 = return address, PC = target
 ```
-
+> The assembler may expose these as seperate mnemonics (`CALL target` and `JMP target`) as pseudoinstructions over the single JAL encoding.
 **Unconditional jump:** `rd` is `r0`, return address discarded:
 ```
 JAL r0, target      ; PC = target, return address silently discarded

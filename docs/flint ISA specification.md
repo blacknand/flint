@@ -76,9 +76,9 @@ The following assembler mnenomics are accepted and lowered to R-type encodings:
 | `MOV rd, rs1` | `ADD rd, rs1, r0` | Adds zero, effectively copies |
 | `NEG rd, rs1` | `SUB rd, r0, rs1` | Zero minus rs1 |
 
-## I-type (immediate operations and loads)
+## I-type (immediate operations, loads, JALR)
 ![I-type format](images/flint%20I-type%20encoding.png)
-- **opcode** `[31:26]`: Two distinct major opcode values are used: one for immedaite ALU operations, and one for loads. The `funct` field completes the decode within each group.
+- **opcode** `[31:26]`: Two distinct major opcode values are used: one for immedaite ALU operations, and one for loads. The `funct` field completes the decode within each group. There is an additional single opcode: JALR.
 - **S** `[25]`: Set-flags bit. Valid on immediate ALU operations. Must be zero on load instructions. S=1 on load is invalid encoding. Behaviour is undefined
 - **rd** `[24:21]`: Destination register. 
 - **rs1** `[20:17]`: Base register. For ALU operations. For loads, the base address register.
@@ -107,6 +107,21 @@ Effective address = `rs1` + sign_extend(imm).
 | 011 | LHU | rd = zero_extend(mem[EA][15:0]) | unsigned short |
 | 100 | LW | rd = mem[EA][31:0] | int, pointer |
 | 101-111 | — | Reserved | |
+
+### JALR
+JALR has an opcode specifically. JALR is used for unconditional jump and link register. The `funct` field has no purpose here since JALR is the only instruction in the opcode, so it is reserved with the value `000`. JALR gives three pseudoinstructions:
+```
+RET        →  JALR r0,  r14, 0
+CALL reg   →  JALR r14, reg, 0
+JR reg     →  JALR r0,  reg, 0
+```
+#### Semantics
+```
+target = rs1 + sign_extend(imm)
+rd = PC + 4
+PC = target
+```
+The S-bit must be reserved with value 0.
 
 > LH and LHU require 2-byte aligned addresses. LW requires 4-byte aligned addresses. LB and LBU have no alignment requirement. Misaligned accesses produce architecturally undefined behaviour.
 
@@ -211,11 +226,12 @@ JAL r0, target      ; PC = target, return address silently discarded
 | 000001 | I-type immediate ALU |
 | 000010 | I-type loads |
 | 000011 | S-type stores |
-| 001100 | B-type branches |
+| 000100 | B-type branches |
 | 000101 | U-type upper immediate |
 | 000110 | U-type AUIPC (reserved, Phase 3 PIC) |
 | 000111 | J-type jump and link |
-| 001000–001111 | Reserved for M-type (addressing modes, Phase 3) |
+| 001000 | JALR dedicated opcode |
+| 001001–001111 | Reserved for M-type (addressing modes, Phase 3) |
 | 010000–010111 | Reserved for A-type (atomics, Phase 3) |
 | 011000–011111 | Reserved for V-type (vectors, Phase 3) |
 | 100000 | Reserved for M extension (MUL/DIV) |

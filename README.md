@@ -9,4 +9,5 @@ The result is a 32-bit RISC processor with features that span the full breadth o
 See `/docs` for the flint documentation. 
 
 ## Acknowledgments
-The flint ISA is influenced by the RISC-V unpriviledged specification. I used claude to learn a lot of the topics, as well using claude as a search engine, asking questions related to errors, etc. I did not use claude to write any of the code.
+- The flint ISA, specification, etc. is influenced by RISC-V (RV32I) and AArch32. This includes the RISC-V unpriviledged specification, RISC-V calling, and AArch32 GPRs, PC and special-purpose registers.
+- I used Claude to learn concepts + topics quickly. I also used claude to assist in some of the design decisions, such as the encoding for the types of operations in the flint ISA. Claude did not write any of the code, it was used more as a learning tool/search engine.

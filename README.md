@@ -6,4 +6,7 @@ flint is a from-scratch instruction set architecture and the toolchain infrastru
 The result is a 32-bit RISC processor with features that span the full breadth of the GCC backend: 16 general-purpose registers and 8 128-bit SIMD registers exercising multi-bank register allocation; five addressing modes including pre- and post-increment giving the addressing mode selection logic something real to do; predicated execution and if-conversion; a counted hardware loop; load-exclusive/store-exclusive atomics with a proper weak memory model; and full position-independent code and thread-local storage support.
 
 ## Documentation
-See `/docs` for the flint documentation. There you will find the ISA specification document.
+See `/docs` for the flint documentation. 
+
+## Acknowledgments
+The flint ISA is influenced by the RISC-V unpriviledged specification. I used claude to learn a lot of the topics, as well using claude as a search engine, asking questions related to errors, etc. I did not use claude to write any of the code.

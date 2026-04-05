@@ -120,6 +120,8 @@ Effective address = `rs1` + sign_extend(imm).
 
 ## B-type (conditional branches)
 ![B-type encoding](images/flint%20B-type%20encoding.png)
+
+
 flint uses a CR updated by prior instructions. The branch instruction only needs to know which condition to test — no register fields are required for comparison. This frees the entire remaining word for the offset, yielding a substantially larger branch range than comparison-in-branch designs (such as RV32I (32-bit RISC-V)).
 ### Fields
 - **opcode** `[31:26]`: One major opcode value for all conditonal branches.
@@ -146,6 +148,8 @@ flint uses a CR updated by prior instructions. The branch instruction only needs
 | 1110-1111 | — | Reserved | |
 
 ## U-type (upper immediate)
+![U-type encoding](images/U-type%20flint%20encoding.png)
+
 U-type loads a large immediate into the upper portion of a register, enabling the construction of arbitrary 32-bit constants via a two-instruction sequence with a subsequent ADDI.
 ### Fields
 - **opcode** `[31:26]`: One major opcode value. A second opcode value is reserved for an AUIPC variant (add upper immediate to PC), needed for positon-independent code.
@@ -160,7 +164,8 @@ ADDI    rd, rd, lower(k)    ; rd = rd + sign_extend(lower14(k))
 > **Sign adjustment:** Because ADDI sign-extends its 14-bit immediate, if bit 13 of `lower14(K)` is 1, ADDI interprets the lower part as a negative number and subtracts. The assembler must detect this and add 1 to the upper immediate to compensate. This adjustment is handled transparently by the assembler — the programmer specifies the constant and the assembler emits the correct pair. Formally: if `k[13] == 1`, encode `upper = (K >> 14) + 1`, else `upper = K >> 14`.
 
 ## J-type (jump and link)
-![J-type encoding](images/flint%20J-type%20encoding.png)
+![J-type encoding](images/J-type%20encoding.png)
+
 ### Fields
 - **opcode** `[31:26]`: One major opcode value.
 - **rd** `[25:22]`: Return address destination. The hardware writes `PC + 4` (the address of the instruction following the JAL) into `rd` before jumping. Writing to `r0` discards the return address silently.
@@ -186,6 +191,7 @@ JAL r0, target      ; PC = target, return address silently discarded
 
 ## Opcode space allocation
 6-bit opcode field, 64 total slots.
+> I have not assigned the opcodes their concrete binary values yet. This will be done when I begin working on the assembler.
 
 | Opcode range | Assigned to |
 | :--- | :--- |

@@ -8,6 +8,18 @@ flint uses 32 bits, fixed width registers + instructions. It is little endian. A
 - Bit patterns marked reserved must be zero in all encoded instructions. Behaviour on non-zero reserved fields is undefined.
 ## Register file
 flint has 16 GPRs, `r0` through `r15`, each 32 bits wide. Register fields in all instruction formats are 4-bits wide, encoding values 0-15. `r0` is hardwired to zero. Reading `r0` always produces 0. Writing to `r0` is a silently discarded. This gives rise to several pseudoinstructions described later in this document.
+
+### Registers
+| Register | Role | Category |
+| :--- | :--- | :--- |
+| r0 | Zero | Fixed |
+| r1–r4 | Argument / caller-saved | Caller-saved |
+| r5–r11 | Callee-saved variables | Callee-saved |
+| r12 | Thread pointer | Fixed |
+| r13 | Stack pointer | Fixed |
+| r14 | Link register | Special |
+| r15 | IP scratch | Caller-saved |
+
 ## Condition register (CR)
 flint maintains a dedicated condition register holding four single-bit flags updated by S-bit instructions:
 | Flag | Name | Set when |

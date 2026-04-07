@@ -1,7 +1,7 @@
 # flint
 **A custom 32-bit RISC ISA and complete GCC backend, built to understand the GCC compiler infrastructure from first principles.**
 
-flint is a from-scratch instruction set architecture and the toolchain infrastructure around it: a GCC backend, an assembler, and a cycle-level pipeline simulator. I built flint to understand the GCC backend from first principles, since there is no better way to gain an understanding of a large scale system like GCC than learning how to navigate and modify it. There is also no textbooks on the inner workings of GCC, and GCC is very difficult to learn and contribute to as a beginner.
+flint is a from-scratch instruction set architecture and the toolchain infrastructure around it: a GCC backend, an assembler, and a cycle-level pipeline simulator. I built flint to understand the GCC backend from first principles, since there is no better way to gain an understanding of a large scale system like GCC than learning how to navigate and modify it. There is also no textbooks on the inner workings of GCC, and GCC is very difficult to learn and contribute to as a beginner, so hopefully others looking to learn and contribute to GCC may also find this useful.
 
 ## Documentation
 See `/docs` for the flint documentation. 

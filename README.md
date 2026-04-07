@@ -1,12 +1,13 @@
 # flint
-**A custom 32-bit RISC ISA and complete GCC backend — built to understand compiler infrastructure from first principles.**
+**A custom 32-bit RISC ISA and complete GCC backend, built to understand the GCC compiler infrastructure from first principles.**
 
-flint is a from-scratch instruction set architecture and the toolchain infrastructure around it: a GCC backend, an assembler, and a cycle-level pipeline simulator. Most GCC backends are ported, but I decided to completely build the flint compiler from scratch. Every instruction, every encoding choice, every ABI decision was made deliberately with a specific compiler engineering question in mind: "what does GCC need to see here to exercise the relevant subsystem correctly?". The goal of this is to understand the GCC backend as in depth as possible.
-
-The result is a 32-bit RISC processor with features that span the full breadth of the GCC backend: 16 general-purpose registers and 8 128-bit SIMD registers exercising multi-bank register allocation; five addressing modes including pre- and post-increment giving the addressing mode selection logic something real to do; predicated execution and if-conversion; a counted hardware loop; load-exclusive/store-exclusive atomics with a proper weak memory model; and full position-independent code and thread-local storage support.
+flint is a from-scratch instruction set architecture and the toolchain infrastructure around it: a GCC backend, an assembler, and a cycle-level pipeline simulator. I built flint to understand the GCC backend from first principles, since there is no better way to gain an understanding of a large scale system like GCC than learning how to navigate and modify it. There is also no textbooks on the inner workings of GCC, and GCC is very difficult to learn and contribute to as a beginner.
 
 ## Documentation
 See `/docs` for the flint documentation. 
+
+## Contributing
+flint is more of an educational project than anything else, so it is very likely to have flaws or issues. If you find any, please either raise an issue or open up a PR. Thank you.
 
 ## Acknowledgments
 - The flint ISA, specification, etc. is influenced by RISC-V (RV32I) and AArch32. This includes the RISC-V unpriviledged specification, RISC-V calling, and AArch32 GPRs, PC and special-purpose registers.

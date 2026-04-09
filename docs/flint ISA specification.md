@@ -4,7 +4,6 @@
 flint uses 32 bits, fixed width registers + instructions. It is little endian. All instructions must be 4-byte aligned. The bottom 2 bits of any valid instruction address are always zero. flint uses nine instruction formats in total. Six are defined here as the base ISA (R, I, S, B, U, J). Three are defined alongside their corresponding GCC backend subsystem work (M, A, V). All formats share the following invariants:
 - The opcode field always occupies bits `[31:26]`. The hardware extracts this field identically regardless of the format.
 - In formats where the S-bit is present, it occupies bit `[25]`, immediately to the right of the opcode.
-- Where register fields `rs1` and `rs2` are present, `rs1` is always at `[20:17]` and `rs2` is always at `[24:21]`. This allows the hardware to begin reading the register file before format decode is complete.
 - Bit patterns marked reserved must be zero in all encoded instructions. Behaviour on non-zero reserved fields is undefined.
 ## Register file
 flint has 16 GPRs, `r0` through `r15`, each 32 bits wide. Register fields in all instruction formats are 4-bits wide, encoding values 0-15. `r0` is hardwired to zero. Reading `r0` always produces 0. Writing to `r0` is a silently discarded. This gives rise to several pseudoinstructions described later in this document.
@@ -52,6 +51,7 @@ CR is only updated by instructions with S=1. Instructions with S=0 leave CR enti
 - **Reserved** `[8:0]`: Must be zero. Reserved for future use.
 
 ### Operations 
+Addressing mode 2 is an R-type instruction and the load variant is determined by the funct field.
 | funct | Mnemonic | Operation | Notes |
 | :--- | :--- | :--- | :--- |
 | 0000 | ADD | rd = rs1 + rs2 | |
@@ -63,7 +63,13 @@ CR is only updated by instructions with S=1. Instructions with S=0 leave CR enti
 | 0110 | LSL | rd = rs1 << rs2[4:0] | Logical shift left by register |
 | 0111 | LSR | rd = rs1 >> rs2[4:0] | Logical shift right, zero-fills |
 | 1000 | ASR | rd = rs1 >>> rs2[4:0] | Arithmetic shift right, sign-fills |
-| 1001-1111 | — | Reserved | funct=1001 reserved for MUL (M extension) |
+| 1001 | — | Reserved | funct=1001 reserved for MUL (M extension) |
+| 1010 | — | Unallocated | |
+| 1011 | — | LW (load word, register offset) | |
+| 1100 | — | LB (load byte signed, register offset) | |
+| 1101 | — | LBU (load byte unsigned, register offset) | |
+| 1110 | — | LH (load halfword signed, register offset) | |
+| 1111 | — | LHU (load halfword unsigned, register offset) | |
 
 ### Shift semantics
 For LSL, LSR, and ASR, only bits `[4:0]` of the runtime values in `rs2` are used as the shift amount (range 0-31). Bits `[31:5]` of `rs2` are ignored at execution time. This is a semantic constraint. 
@@ -98,7 +104,7 @@ The following assembler mnenomics are accepted and lowered to R-type encodings:
 
 > For LSLI, LSRI and ASIR, only bits `[4:0]` of the imm field are used as the shift amount. Bits `[13:5]` of imm must be zero in valid encodings. The assembler enforces this.
 ### Load operations (opcode Group 2)
-Effective address = `rs1` + sign_extend(imm).
+Addressing mode 1 is simply effective address = `rs1` + sign_extend(imm). 
 | funct | Mnemonic | Operation | C type |
 | :--- | :--- | :--- | :--- |
 | 000 | LB | rd = sign_extend(mem[EA][7:0]) | signed char |
@@ -107,6 +113,19 @@ Effective address = `rs1` + sign_extend(imm).
 | 011 | LHU | rd = zero_extend(mem[EA][15:0]) | unsigned short |
 | 100 | LW | rd = mem[EA][31:0] | int, pointer |
 | 101-111 | — | Reserved | |
+
+### Addressing modes 3, 4 and 5
+All of these addressing modes are I-type instructions, with their own opcode so they both have the same funct encodings.
+
+| Funct3 | Instruction |
+| :--- | :--- |
+| 000 | LB |
+| 001 | LBU |
+| 010 | LH |
+| 011 | LHU |
+| 100 | LW |
+| 101–111 | Reserved |
+
 
 ### JALR
 JALR has an opcode specifically. JALR is used for unconditional jump and link register. The `funct` field has no purpose here since JALR is the only instruction in the opcode, so it is reserved with the value `000`. JALR gives three pseudoinstructions:
@@ -181,7 +200,7 @@ U-type loads a large immediate into the upper portion of a register, enabling th
 ### Fields
 - **opcode** `[31:26]`: One major opcode value. A second opcode value is reserved for an AUIPC variant (add upper immediate to PC), needed for positon-independent code.
 - **rd** `[25:22]`: Destination register.
-- **imm** `[21:0]`: 22-bit unsigned immediate. Placed into bits `[31:10]` of `rd`. Bits `[9:0]` of `rd` are cleared to zero. No S-bit.
+- **imm** `[21:0]`: 22-bit unsigned immediate. Placed into bits `[31:10]` of `rd`. Bits `[13:0]` of `rd` are cleared to zero. No S-bit.
 #### 32-bit constant construction
 To load an aribtrary 32-bit constant K into `rd`:
 ```
@@ -204,9 +223,9 @@ PC = PC + sign_extend(offset) << 2
 ```
 Both operations occur atomically — `rd` recieves the return address before the jump takes effect.
 #### Usage patterns
-**Function call:** `rd` is a designated link register (e.g. `r15`):
+**Function call:** `rd` is a designated link register (e.g. `r14`):
 ```
-JAL r15, target     ; r15 = return address, PC = target
+JAL r14, target     ; r14 = return address, PC = target
 ```
 > The assembler may expose these as seperate mnemonics (`CALL target` and `JMP target`) as pseudoinstructions over the single JAL encoding.
 **Unconditional jump:** `rd` is `r0`, return address discarded:
@@ -235,4 +254,7 @@ JAL r0, target      ; PC = target, return address silently discarded
 | 010000–010111 | Reserved for A-type (atomics, Phase 3) |
 | 011000–011111 | Reserved for V-type (vectors, Phase 3) |
 | 100000 | Reserved for M extension (MUL/DIV) |
-| 100001–111111 | Unallocated, available for future extensions |
+| 100001 | Addressing mode 3 (`[rs1 + imm]!`) |
+| 100010 | Addressing mode 4 (`[rs1], imm`) |
+| 100011 | Addressing mode 5 (`[PC + imm]`) |
+| 100100–111111 | Unallocated, available for future extensions |

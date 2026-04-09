@@ -1,15 +1,16 @@
 # flint Calling Convention
 > See the flint ISA specification first.
-## Registers
+
+### Registers
 | Register | Role | Category |
 | :--- | :--- | :--- |
 | r0 | Zero (hardwired) | Fixed |
-| r1–r4 | Arguments / return value / caller-saved scratch | Caller-saved |
+| r1–r4 | Argument / caller-saved scratch / return value | Caller-saved |
 | r5–r11 | Callee-saved variables / frame pointer when needed | Callee-saved |
 | r12 | Thread pointer (TLS base) | Fixed |
 | r13 | Stack pointer | Fixed |
 | r14 | Link register (return address) | Special |
-| r15 | Intra-procedure-call scratch (veneer use) | Caller-saved |
+| r15 | IP scratch (veneer use) | Caller-saved |
 
 ## Argument passing
 - First four registers go in r1-r4 in order

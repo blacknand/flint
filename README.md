@@ -5,7 +5,7 @@ flint is a from-scratch instruction set architecture and the toolchain infrastru
 
 ## Patches
 See the patches made to GCC and binutils-gdb:
-- [flint-GCCA](https://github.com/blacknand/gcc/tree/flint)
+- [flint-GCC](https://github.com/blacknand/gcc/tree/flint)
 - [flint-binutils-gdb](https://github.com/blacknand/binutils-gdb/tree/flint)
 
 ## Documentation

@@ -3,6 +3,11 @@
 
 flint is a from-scratch instruction set architecture and the toolchain infrastructure around it: a GCC backend, an assembler, and a cycle-level pipeline simulator. I built flint to understand the GCC backend from first principles, since there is no better way to gain an understanding of a large scale system like GCC than learning how to navigate and modify it. There is also no textbooks on the inner workings of GCC, and GCC is very difficult to learn and contribute to as a beginner, so hopefully others looking to learn and contribute to GCC may also find this useful.
 
+## Patches
+See the patches made to GCC and binutils-gdb:
+- [flint-GCCA](https://github.com/blacknand/gcc/tree/flint)
+- [flint-binutils-gdb](https://github.com/blacknand/binutils-gdb/tree/flint)
+
 ## Documentation
 See `/docs` for the flint documentation. 
 

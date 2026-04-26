@@ -2,3 +2,5 @@ docs/other
 docs/notes.txt
 docs/other/*.excalidraw
 playground
+gcc
+binutils-gdb

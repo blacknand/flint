@@ -1,5 +1,8 @@
 docs/other
 docs/notes.txt
+docs/flint-phases.md
+docs/flint-gcc.md
+docs/flint-extensions.md
 docs/other/*.excalidraw
 playground
 gcc

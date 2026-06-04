@@ -1,5 +1,4 @@
 # flint ISA: Instruction Format Specification
-**Version: 0.1**
 
 flint uses 32 bits, fixed width registers + instructions. It is little endian. All instructions must be 4-byte aligned. The bottom 2 bits of any valid instruction address are always zero. flint uses nine instruction formats in total. Six are defined here as the base ISA (R, I, S, B, U, J). Three are defined alongside their corresponding GCC backend subsystem work (M, A, V). All formats share the following invariants:
 - The opcode field always occupies bits `[31:26]`. The hardware extracts this field identically regardless of the format.

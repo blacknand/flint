@@ -7,11 +7,11 @@ See the patches made to GCC and binutils-gdb:
 - [flint-binutils-gdb](https://github.com/blacknand/binutils-gdb/tree/flint)
 
 ## Documentation
-See `/docs` for the flint documentation. 
+See `/docs` for the flint documentation. To see the flint-GCC backend, go to `gcc/gcc/config/flint`.
 
 ## Resources/references
 - [ggx/moxie backend](https://atgreen.github.io/ggx/)
 - [gcc-vam](https://github.com/embecosm/gcc-vam/commit/97863f37b4a844e596214f12d13f9b7e0b979b16)
 - [Jeremy Benett: Adding a new backend to GCC for beginners](https://www.youtube.com/watch?v=TE5cjQuMMHA&t=6068s)
-- GCC internals manual
+- [GCC internals manual](https://gcc.gnu.org/onlinedocs/gccint/index.html#SEC_Contents)
 - [IIT Bombay GCC resource centre](https://www.cse.iitb.ac.in/grc/)

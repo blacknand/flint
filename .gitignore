@@ -5,5 +5,3 @@ docs/flint-gcc.md
 docs/flint-extensions.md
 docs/other/*.excalidraw
 playground
-gcc
-binutils-gdb

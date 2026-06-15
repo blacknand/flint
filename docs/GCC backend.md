@@ -1,5 +1,5 @@
 # GCC backend
-> I wrote this while building flint-GCC. My main references were the RV32I backend (32-bit RISC-V), or1k and GCC-VAM. I used Claude + Gemini to piece it all together and work out what everything meant so it is highly likely to have errors.
+> I wrote this while building flint-GCC. My main references were the RV32I backend (32-bit RISC-V), or1k and GCC-VAM. I used Claude + Gemini to piece it all together and work out what everything meant so it is highly likely to have errors. I also wrote this before realising I could just use the GCC INT manual for referencing the or1k backend!
 
 In this document I cover all of the basics needed to build a minimal functional GCC backend to enable users to compile C programs on their target machine. This document is specific to flint, a toy RISC 32 bit architecture I desired to learn GCC backend development -- that being said, you should easily be able to read it and apply it specifically to your target machine (that is, if you are trying to build one). It is written assuming absoultely **no prior knowledge** of GCC but does assume *some* familiartiy with systems programming, C/C++, etc. 
 

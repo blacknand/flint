@@ -26,6 +26,8 @@ Calling convention and stack specification for flint v0.3. See flint-isa.md for 
 
 - **r5**: if SP elimination fails then SFP is eliminated into HFP (r5). r5 is dedicated to holding the frame pointer value and is no longer available as a GPR. GCC saves SP's value into r5 before the prologue moves SP, and uses r5 as the stable anchor instead. r5 never moves after that point.
 
+> r1-r4 are the return value registers -- `return a + b` writes the result to r1. r14 (link register) is where the return address goes -- `JAL r14, target` executes, r14 gets `pc+4` and then `RET` jumps back there. The static chain register (r15 when needed) is for nested functions which is a GCC extension -- whena  function is defined inside another function and can access the outer funciton's local variables. The static chain is a hidden pointer passed to the nested function so it can find the outer function's stack frame. It's a hidden extra argument rather than a return value/address.
+
 ---
 
 ## Argument passing
